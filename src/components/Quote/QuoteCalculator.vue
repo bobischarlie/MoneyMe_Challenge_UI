@@ -1,46 +1,65 @@
 <template>
-  <div class="container-fluid text-center">
+  <div class="container-fluid">
     <div class="row">
       <div>
         <h2>Quote Calculator</h2>
       </div>
       <div>
         <div class="mb-3">
-          <div class="float-start">
-            <label for="customRange1" class="form-label">$2100</label>
+          <div class="mb-3 col-sm-4">
+            <div class="label"></div>
+            <select class="form-select">
+              <option selected value="Select" disabled>Select Product</option>
+              <option value="Product A">Product A</option>
+              <option value="Product B">Product B</option>
+              <option value="Product C">Product C</option>
+            </select>
           </div>
-          <div class="float-end">
-            <label for="customRange1" class="form-label">$15000</label>
+          <br />
+          <div class="range-wrap">
+            <div class="range-value" :style="{ left: rngAmountRequiredPosition }">
+              <span>${{ amountRequired }}</span>
+            </div>
+            <input
+              id="rngRequiredAmount"
+              type="range"
+              min="2100"
+              max="15000"
+              v-model="amountRequired"
+              step="1"
+            />
           </div>
-          <input
-            type="range"
-            class="form-range"
-            v-model="amountRequired"
-            :min="min"
-            :max="max"
-            :step="step"
-            ref="slider"
-          />
-          <div class="d-flex justify-content-center">
-            ${{ amountRequired }}<br />How much do you need?
+          <div class="mb-3 row">
+            <div class="col"><h6>$2100</h6></div>
+            <div class="col text-center">
+              <h4>How much do you need?</h4>
+            </div>
+            <div class="col"><h6 class="float-end">$15000</h6></div>
           </div>
         </div>
-        <div class="mb-3">
-          <select class="form-select">
-            <option value="Product A">Product A</option>
-            <option value="Product B">Product B</option>
-            <option value="Product C">Product C</option>
-          </select>
+        <br />
+        <div class="range-wrap">
+          <div class="range-value" :style="{ left: rngTermPosition }">
+            <span id="rngTermTooltip">{{ term }} Month/s</span>
+          </div>
+          <input id="rngTerm" type="range" class="form-range" v-model="term" min="1" max="12" />
+          <div class="mb-3 row">
+            <div class="col">
+              <h6>1 Month</h6>
+            </div>
+            <div class="col text-center"><h4>Term</h4></div>
+            <div class="col"><h6 class="float-end">12 Months</h6></div>
+          </div>
         </div>
-        <div class="mb-3">
-          <select class="form-select">
-            <option value="Mr.">Mr.</option>
-            <option value="Mrs.">Mrs.</option>
-            <option value="Ms.">Ms.</option>
-          </select>
-        </div>
-        <div>
-          <div class="form-floating mb-3">
+        <div class="row">
+          <div class="mb-3 col-md-2">
+            <select class="form-select">
+              <option value="Mr.">Mr.</option>
+              <option value="Mrs.">Mrs.</option>
+              <option value="Ms.">Ms.</option>
+            </select>
+          </div>
+          <div class="form-floating mb-3 col-md-5">
             <input
               id="txtFirstName"
               v-model="firstName"
@@ -50,7 +69,7 @@
             />
             <label for="txtFirstName">First Name</label>
           </div>
-          <div class="form-floating mb-3">
+          <div class="form-floating mb-3 col-md-5">
             <input
               id="txtLastName"
               v-model="lastName"
@@ -60,15 +79,13 @@
             />
             <label for="txtLastName">Last Name</label>
           </div>
-          <div>
-            <label for="example-datepicker">Choose a date</label>
-            <b-form-datepicker
-              id="example-datepicker"
-              v-model="dateOfBirth"
-              class="mb-2"
-            ></b-form-datepicker>
+        </div>
+        <div class="row">
+          <div class="mb-3 col-md-4">
+            <label for="dtDOB">Date of Birth:</label>
+            <input type="date" class="form-control" id="dtDOB" v-model="dateOfBirth" />
           </div>
-          <div class="form-floating mb-3">
+          <div class="form-floating mb-3 col-md-4">
             <input
               id="txtEmail"
               v-model="email"
@@ -78,7 +95,7 @@
             />
             <label for="txtEmail">Email Address</label>
           </div>
-          <div class="form-floating mb-3">
+          <div class="form-floating mb-3 col-md-4">
             <input
               id="txtMobileNo"
               v-model="mobileNo"
@@ -88,6 +105,8 @@
             />
             <label for="txtMobileNo">Mobile Number</label>
           </div>
+        </div>
+        <div class="text-center">
           <button type="button" class="btn btn-success">Calculate Quote</button>
         </div>
       </div>
@@ -95,71 +114,5 @@
   </div>
 </template>
 
-<script>
-import axios from 'axios'
-
-export default {
-  data() {
-    return {
-      value: 2100,
-      min: 2100,
-      max: 15000,
-      step: 100,
-      amountRequired: '',
-      firstName: '',
-      lastName: '',
-      dateOfBirth: '',
-      email: '',
-      mobileNo: ''
-    }
-  },
-  methods: {
-    async fetchData() {
-      const id = this.$route.params.id
-      if (!id) {
-        this.clearData()
-      } else {
-        const response = await axios.get(`https://moneyme.local/quote/${id}`)
-        const data = response.data
-        this.amountRequired = data.amountRequired
-        this.firstName = data.firstName
-        this.lastName = data.lastName
-        this.dateOfBirth = data.dateOfBirth
-        this.email = data.email
-        this.mobileNo = data.mobileNo
-
-        // Save data to local storage
-        localStorage.setItem('quoteData', JSON.stringify(data))
-      }
-    },
-    loadData() {
-      const data = JSON.parse(localStorage.getItem('quoteData'))
-      if (data) {
-        this.amountRequired = data.amountRequired
-        this.firstName = data.firstName
-        this.lastName = data.lastName
-        this.dateOfBirth = data.dateOfBirth
-        this.email = data.email
-        this.mobileNo = data.mobileNo
-      }
-    },
-    clearData() {
-      this.amountRequired = ''
-      this.firstName = ''
-      this.lastName = ''
-      this.dateOfBirth = ''
-      this.email = ''
-      this.mobileNo = ''
-      localStorage.removeItem('quoteData')
-    }
-  },
-  watch: {
-    '$route.params.id': 'fetchData'
-  },
-  mounted() {
-    this.loadData()
-    this.fetchData()
-  }
-}
-</script>
-<style scoped></style>
+<script src="./QuoteCalculator.js"></script>
+<style src="./QuoteCalculator.css" scoped></style>
