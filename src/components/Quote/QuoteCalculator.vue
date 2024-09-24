@@ -15,13 +15,15 @@
           <input
             type="range"
             class="form-range"
-            v-model="value"
+            v-model="amountRequired"
             :min="min"
             :max="max"
             :step="step"
             ref="slider"
           />
-          <div class="d-flex justify-content-center">${{ value }}<br />How much do you need?</div>
+          <div class="d-flex justify-content-center">
+            ${{ amountRequired }}<br />How much do you need?
+          </div>
         </div>
         <div class="mb-3">
           <select class="form-select">
@@ -62,10 +64,9 @@
             <label for="example-datepicker">Choose a date</label>
             <b-form-datepicker
               id="example-datepicker"
-              v-model="value"
+              v-model="dateOfBirth"
               class="mb-2"
             ></b-form-datepicker>
-            <p>Value: '{{ value }}'</p>
           </div>
           <div class="form-floating mb-3">
             <input
@@ -104,8 +105,10 @@ export default {
       min: 2100,
       max: 15000,
       step: 100,
+      amountRequired: '',
       firstName: '',
       lastName: '',
+      dateOfBirth: '',
       email: '',
       mobileNo: ''
     }
@@ -118,8 +121,10 @@ export default {
       } else {
         const response = await axios.get(`https://moneyme.local/quote/${id}`)
         const data = response.data
+        this.amountRequired = data.amountRequired
         this.firstName = data.firstName
         this.lastName = data.lastName
+        this.dateOfBirth = data.dateOfBirth
         this.email = data.email
         this.mobileNo = data.mobileNo
 
@@ -130,15 +135,19 @@ export default {
     loadData() {
       const data = JSON.parse(localStorage.getItem('quoteData'))
       if (data) {
+        this.amountRequired = data.amountRequired
         this.firstName = data.firstName
         this.lastName = data.lastName
+        this.dateOfBirth = data.dateOfBirth
         this.email = data.email
         this.mobileNo = data.mobileNo
       }
     },
     clearData() {
+      this.amountRequired = ''
       this.firstName = ''
       this.lastName = ''
+      this.dateOfBirth = ''
       this.email = ''
       this.mobileNo = ''
       localStorage.removeItem('quoteData')
