@@ -10,8 +10,7 @@
           <div class="mb-3 col-sm-4">
             <div class="label"></div>
             <select v-model="selectedProduct" class="form-select">
-              <option selected value="Select" disabled>Select Product</option>
-              <option value="Product A">Product A</option>
+              <option value="Product A" selected>Product A</option>
               <option value="Product B">Product B</option>
               <option value="Product C">Product C</option>
             </select>

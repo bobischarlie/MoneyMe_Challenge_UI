@@ -16,3 +16,8 @@
   background: #fff; /* Match the background color */
   padding: 0 5px;
 }
+
+.modal-fullHeight {
+  max-height: 75vh;
+  overflow-y: auto;
+}

@@ -24,7 +24,7 @@ export default {
       mobileNo: '',
       startDate: '',
       isLoading: true,
-      selectedProduct: 'Select'
+      selectedProduct: 'Product A'
     }
   },
   components: { LoadingSpinner, LoanApply },
