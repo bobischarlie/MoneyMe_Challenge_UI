@@ -78,3 +78,7 @@ input[type='range']:focus::-webkit-slider-runnable-track {
   width: 130px;
   margin-top: 15px;
 }
+
+#btnCalculate {
+  box-shadow: 2px 5px 8px 5px rgba(0, 0, 0, 0.3);
+}

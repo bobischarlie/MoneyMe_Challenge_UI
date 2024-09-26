@@ -1,6 +1,7 @@
 <template>
   <div class="container-fluid">
-    <div class="row">
+    <LoadingSpinner v-if="isLoading"></LoadingSpinner>
+    <div v-else class="row">
       <div>
         <h2>Quote Calculator</h2>
       </div>
@@ -8,7 +9,7 @@
         <div class="mb-3">
           <div class="mb-3 col-sm-4">
             <div class="label"></div>
-            <select class="form-select">
+            <select v-model="selectedProduct" class="form-select">
               <option selected value="Select" disabled>Select Product</option>
               <option value="Product A">Product A</option>
               <option value="Product B">Product B</option>
@@ -17,16 +18,18 @@
           </div>
           <br />
           <div class="range-wrap">
-            <div class="range-value" :style="{ left: rngAmountRequiredPosition }">
+            <div
+              class="range-value"
+              :style="{ left: rngAmountProperties.rngAmountRequiredPosition }"
+            >
               <span>${{ amountRequired }}</span>
             </div>
             <input
               id="rngRequiredAmount"
               type="range"
-              min="2100"
-              max="15000"
+              :min="rngAmountProperties.min"
+              :max="rngAmountProperties.max"
               v-model="amountRequired"
-              step="1"
             />
           </div>
           <div class="mb-3 row">
@@ -39,16 +42,23 @@
         </div>
         <br />
         <div class="range-wrap">
-          <div class="range-value" :style="{ left: rngTermPosition }">
+          <div class="range-value" :style="{ left: rngTermProperties.rngTermPosition }">
             <span id="rngTermTooltip">{{ term }} Month/s</span>
           </div>
-          <input id="rngTerm" type="range" class="form-range" v-model="term" min="1" max="12" />
+          <input
+            id="rngTerm"
+            type="range"
+            class="form-range"
+            v-model="term"
+            :min="rngTermProperties.min"
+            :max="rngTermProperties.max"
+          />
           <div class="mb-3 row">
             <div class="col">
-              <h6>1 Month</h6>
+              <h6>{{ rngTermProperties.min }} Month/s</h6>
             </div>
             <div class="col text-center"><h4>Term</h4></div>
-            <div class="col"><h6 class="float-end">12 Months</h6></div>
+            <div class="col"><h6 class="float-end">24 Months</h6></div>
           </div>
         </div>
         <div class="row">
@@ -107,10 +117,32 @@
           </div>
         </div>
         <div class="text-center">
-          <button type="button" class="btn btn-success">Calculate Quote</button>
+          <button
+            id="btnCalculate"
+            type="button"
+            data-bs-toggle="modal"
+            data-bs-target="#modalLoanAPply"
+            class="btn btn-success btn-lg"
+          >
+            Calculate Quote
+          </button>
+        </div>
+        <div class="text-center">
+          <div class="text-center">
+            <small>Quote does not affect your credit score</small>
+          </div>
         </div>
       </div>
     </div>
+    <LoanApply
+      :Term="term"
+      :AmountRequired="amountRequired"
+      :FullName="fullName"
+      :MobileNo="mobileNo"
+      :Email="email"
+      :DateOfBirth="dateOfBirth"
+      :SelectedProduct="selectedProduct"
+    />
   </div>
 </template>
 

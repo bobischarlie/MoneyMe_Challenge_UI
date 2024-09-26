@@ -1,0 +1,18 @@
+.hr-container {
+  position: relative;
+  text-align: center;
+}
+
+.hr-container hr {
+  border: none;
+  border-top: 1px solid #000;
+  margin: 20px 0;
+}
+
+.hr-container .hr-text {
+  position: absolute;
+  right: 0;
+  bottom: -10px; /* Adjust as needed */
+  background: #fff; /* Match the background color */
+  padding: 0 5px;
+}
