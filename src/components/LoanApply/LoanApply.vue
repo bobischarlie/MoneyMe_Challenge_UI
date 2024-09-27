@@ -64,7 +64,7 @@
               <div class="row">
                 <div class="col-6"><label class="form-label">Name</label></div>
                 <div class="col-6">
-                  <label class="form-label float-end">{{ FullName }}</label>
+                  <label class="form-label float-end">{{ fullName }}</label>
                 </div>
               </div>
               <div class="row">
@@ -139,7 +139,7 @@
         </div>
         <div class="modal-footer">
           <div class="col-12 d-grid gap-2">
-            <button type="button" class="btn btn-success">Apply Now</button>
+            <button type="button" class="btn btn-success" @click="handleApplyNow">Apply Now</button>
           </div>
           <div>
             <p>

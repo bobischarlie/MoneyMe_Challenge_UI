@@ -1,4 +1,5 @@
 import QuoteBreakdown from '../QuoteBreakdown/QuoteBreakdown.vue'
+import axios from 'axios'
 
 export default {
   data() {
@@ -6,11 +7,15 @@ export default {
       payment: null,
       interestRate: '',
       monthlyBreakdown: [],
-      totalAmountToPay: ''
+      totalAmountToPay: '',
+      blacklistMessage: '',
+      totalInterest: ''
     }
   },
   props: {
-    FullName: String,
+    Title: String,
+    FirstName: String,
+    LastName: String,
     MobileNo: String,
     Email: String,
     DateOfBirth: String,
@@ -52,6 +57,56 @@ export default {
       }
       this.totalAmountToPay = breakdownList.reduce((sum, item) => sum + item.Amount, 0).toFixed(2)
       this.monthlyBreakdown = breakdownList
+    },
+    validated() {
+      const errors = []
+      if (this.applicantAge < 18) {
+        errors.push('Applicant must be at least 18 years old.')
+      }
+      if (!this.isEmailOrNumberBlacklisted()) {
+        errors.push(this.blacklistMessage)
+      }
+      return errors.length == 0
+    },
+    async isEmailOrNumberBlacklisted() {
+      const mobileNo = encodeURIComponent(this.MobileNo)
+      const emailDomain = encodeURIComponent(this.Email.split('@')[1])
+      const uri = `https://localhost:7057/blacklist/GetBlacklisted?mobileNo=${mobileNo}&emailDomain=${emailDomain}`
+      const encodedURI = encodeURI(uri)
+      const response = await axios.get(encodedURI)
+      const data = response.data
+      this.blacklistMessage = data.message
+      return data.data == null
+    },
+    async handleApplyNow() {
+      if (this.validated()) {
+        try {
+          const id = this.$route.params.id
+          const response = await axios.put(`https://localhost:7057/Quote/${id}`, {
+            FirstName: this.FirstName,
+            LastName: this.LastName,
+            MobileNo: this.MobileNo,
+            Email: this.Email,
+            Title: this.Title,
+            DateOfBirth: this.DateOfBirth,
+            AmountRequired: this.AmountRequired,
+            Repaymentamount: this.totalAmountToPay,
+            EstablishmentFee: 300,
+            TotalInterest: this.totalAmountToPay - this.AmountRequired,
+            Term: this.Term,
+            Product: this.SelectedProduct,
+            Status: 1
+          })
+          console.log('Application submitted successfully:', response.data)
+          this.$router.push({ name: 'SuccessPage' }).then(() => {
+            window.location.reload()
+          })
+        } catch (error) {
+          console.error('Error submitting application:', error)
+        }
+      } else {
+        console.error('Validation failed')
+      }
     }
   },
   mounted() {
@@ -66,6 +121,19 @@ export default {
         return this.AmountRequired / this.Term
       }
       return null
+    },
+    applicantAge() {
+      const today = new Date()
+      const birthDate = new Date(this.DateOfBirth)
+      let age = today.getFullYear() - birthDate.getFullYear()
+      const monthDifference = today.getMonth() - birthDate.getMonth()
+      if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDate.getDate())) {
+        age--
+      }
+      return age
+    },
+    fullName() {
+      return `${this.FirstName} ${this.LastName}`
     }
   },
   watch: {

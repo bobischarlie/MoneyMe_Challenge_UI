@@ -62,7 +62,7 @@
         </div>
         <div class="row">
           <div class="mb-3 col-md-2">
-            <select class="form-select">
+            <select v-model="title" class="form-select">
               <option value="Mr.">Mr.</option>
               <option value="Mrs.">Mrs.</option>
               <option value="Ms.">Ms.</option>
@@ -136,7 +136,9 @@
     <LoanApply
       :Term="term"
       :AmountRequired="amountRequired"
-      :FullName="fullName"
+      :Title="title"
+      :FirstName="firstName"
+      :LastName="lastName"
       :MobileNo="mobileNo"
       :Email="email"
       :DateOfBirth="dateOfBirth"

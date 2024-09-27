@@ -17,6 +17,7 @@ export default {
       },
       term: '',
       amountRequired: '',
+      title: '',
       firstName: '',
       lastName: '',
       dateOfBirth: null,
@@ -35,10 +36,11 @@ export default {
         this.clearData()
       } else {
         try {
-          const response = await axios.get(`https://moneyme.local/quote/${id}`)
+          const response = await axios.get(`https://localhost:7057/quote/${id}`)
           const data = response.data
           this.amountRequired = data.amountRequired
           this.term = data.term
+          this.title = data.title
           this.firstName = data.firstName
           this.lastName = data.lastName
           this.dateOfBirth = data.dateOfBirth
@@ -57,6 +59,7 @@ export default {
       if (data) {
         this.amountRequired = data.amountRequired
         this.term = data.term
+        this.title = data.title
         this.firstName = data.firstName
         this.lastName = data.lastName
         this.dateOfBirth = data.dateOfBirth
@@ -67,6 +70,7 @@ export default {
     clearData() {
       this.amountRequired = '2100'
       this.term = '1'
+      this.title = ''
       this.firstName = ''
       this.lastName = ''
       this.dateOfBirth = ''
@@ -112,9 +116,5 @@ export default {
     this.setValue()
     this.setTermPos()
   },
-  computed: {
-    fullName() {
-      return `${this.firstName} ${this.lastName}`
-    }
-  }
+  computed: {}
 }

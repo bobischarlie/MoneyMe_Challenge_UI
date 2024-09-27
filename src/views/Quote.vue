@@ -1,9 +1,5 @@
-<script setup>
-import QuoteCalculator from '@/components/Quote/QuoteCalculator.vue';
-</script>
+<script setup></script>
 
-<template>
-    <QuoteCalculator></QuoteCalculator>
-</template>
+<template>Home Page Nothing Special</template>
 
 <style></style>
