@@ -22,4 +22,8 @@ npm install
 npm run dev
 ```
 
+Things to check:
+check the file in public>confi.json, the moneymeAPIUrl value should be the same URL you have when running the .net core application
+![image](https://github.com/user-attachments/assets/fa9adb1a-7775-4d5f-b450-16edcab48115)
+
 
