@@ -36,7 +36,7 @@ export default {
         this.clearData()
       } else {
         try {
-          const response = await axios.get(`https://localhost:7057/quote/${id}`)
+          const response = await axios.get(`${this.$config.moneyMeApiURL}/quote/${id}`)
           const data = response.data
           this.amountRequired = data.amountRequired
           this.term = data.term

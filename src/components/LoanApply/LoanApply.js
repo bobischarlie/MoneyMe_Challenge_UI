@@ -8,8 +8,9 @@ export default {
       interestRate: '',
       monthlyBreakdown: [],
       totalAmountToPay: '',
-      blacklistMessage: '',
-      totalInterest: ''
+      totalInterest: 0,
+      errors: [],
+      establishmentFee: 300
     }
   },
   props: {
@@ -33,9 +34,11 @@ export default {
       const monthlyRate = this.interestRate / 100 / 12
       const numberOfPayments = this.Term
       const presentValue = this.AmountRequired
+      const establishmentFeeToAdd = this.establishmentFee / this.Term
 
-      this.payment = this.PMT(monthlyRate, numberOfPayments, presentValue)
+      this.payment = this.PMT(monthlyRate, numberOfPayments, presentValue) + establishmentFeeToAdd
       this.setMonthlyBreakdownItems()
+      this.totalInterest = this.totalAmountToPay - this.AmountRequired - this.establishmentFee
     },
     PMT(rate, nper, pv) {
       if (rate === 0) return pv / nper
@@ -58,31 +61,44 @@ export default {
       this.totalAmountToPay = breakdownList.reduce((sum, item) => sum + item.Amount, 0).toFixed(2)
       this.monthlyBreakdown = breakdownList
     },
-    validated() {
-      const errors = []
+    async validated() {
+      this.errors = []
       if (this.applicantAge < 18) {
-        errors.push('Applicant must be at least 18 years old.')
+        this.errors.push('Applicant must be at least 18 years old.')
       }
-      if (!this.isEmailOrNumberBlacklisted()) {
-        errors.push(this.blacklistMessage)
-      }
-      return errors.length == 0
+      await this.isEmailOrNumberBlacklisted()
+      return this.errors.length == 0
     },
     async isEmailOrNumberBlacklisted() {
-      const mobileNo = encodeURIComponent(this.MobileNo)
-      const emailDomain = encodeURIComponent(this.Email.split('@')[1])
-      const uri = `https://localhost:7057/blacklist/GetBlacklisted?mobileNo=${mobileNo}&emailDomain=${emailDomain}`
-      const encodedURI = encodeURI(uri)
-      const response = await axios.get(encodedURI)
-      const data = response.data
-      this.blacklistMessage = data.message
-      return data.data == null
+      try {
+        const mobileNo = encodeURIComponent(this.MobileNo)
+        const emailDomain = encodeURIComponent(this.Email.split('@')[1])
+        const uri = `${this.$config.moneyMeApiURL}/blacklist/GetBlacklisted?mobileNo=${mobileNo}&emailDomain=${emailDomain}`
+        const encodedURI = encodeURI(uri)
+        const response = await axios.get(encodedURI)
+        const data = response.data
+
+        if (data.data != null) {
+          data.data.forEach((element) => {
+            const val = element.value
+            if (element.type == 1) {
+              this.errors.push(`The email domain (${val}) is blacklisted, please choose another.`)
+            } else {
+              this.errors.push(
+                `Mobile No ${val} is blacklisted, please choose another mobile number.`
+              )
+            }
+          })
+        }
+      } catch (error) {
+        console.error('Error fetching blacklist data:', error)
+      }
     },
     async handleApplyNow() {
-      if (this.validated()) {
+      if (await this.validated()) {
         try {
           const id = this.$route.params.id
-          const response = await axios.put(`https://localhost:7057/Quote/${id}`, {
+          const response = await axios.put(`${this.$config.moneyMeApiURL}/quote/${id}`, {
             FirstName: this.FirstName,
             LastName: this.LastName,
             MobileNo: this.MobileNo,
@@ -91,8 +107,8 @@ export default {
             DateOfBirth: this.DateOfBirth,
             AmountRequired: this.AmountRequired,
             Repaymentamount: this.totalAmountToPay,
-            EstablishmentFee: 300,
-            TotalInterest: this.totalAmountToPay - this.AmountRequired,
+            EstablishmentFee: this.establishmentFee,
+            TotalInterest: this.totalInterest,
             Term: this.Term,
             Product: this.SelectedProduct,
             Status: 1
@@ -105,7 +121,9 @@ export default {
           console.error('Error submitting application:', error)
         }
       } else {
-        console.error('Validation failed')
+        this.errors.forEach((item) => {
+          console.error(item)
+        })
       }
     }
   },
@@ -115,6 +133,9 @@ export default {
   computed: {
     calculatePaymentIfChanged() {
       return [this.AmountRequired, this.Term, this.interestRate, this.SelectedProduct]
+    },
+    fieldsWithValidation() {
+      return [this.MobileNo, this.Email]
     },
     firstTwoMonthsForProductB() {
       if (this.SelectedProduct === 'Product B') {
@@ -140,6 +161,12 @@ export default {
     calculatePaymentIfChanged: {
       handler() {
         this.calculatePayment()
+      },
+      deep: true
+    },
+    fieldsWithValidation: {
+      handler() {
+        this.errors = []
       },
       deep: true
     }

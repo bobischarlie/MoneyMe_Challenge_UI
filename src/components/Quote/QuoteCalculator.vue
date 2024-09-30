@@ -120,7 +120,7 @@
             id="btnCalculate"
             type="button"
             data-bs-toggle="modal"
-            data-bs-target="#modalLoanAPply"
+            data-bs-target="#modalLoanApply"
             class="btn btn-success btn-lg"
           >
             Calculate Quote

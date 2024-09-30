@@ -1,9 +1,9 @@
 <template>
   <div
     class="modal fade"
-    id="modalLoanAPply"
+    id="modalLoanApply"
     tabindex="-1"
-    aria-labelledby="modalLoanAPply"
+    aria-labelledby="modalLoanApply"
     aria-hidden="true"
   >
     <div class="modal-dialog modal-fullscreen-md-down">
@@ -56,6 +56,13 @@
               role="tabpanel"
               aria-labelledby="nav-home-tab"
             >
+              <div v-if="errors.length > 0" class="row">
+                <div class="alert alert-danger" role="alert">
+                  <ul v-for="(item, index) in errors" :key="index">
+                    <li>{{ item }}</li>
+                  </ul>
+                </div>
+              </div>
               <h5 class="modal-title" id="exampleModalLabel">Your Quote: {{ SelectedProduct }}</h5>
               <hr />
               <div class="row">
@@ -144,10 +151,11 @@
           <div>
             <p>
               <small
-                >Total repayments ${{ totalAmountToPay }} made up of interest ${{
-                  (totalAmountToPay - AmountRequired).toFixed(2)
-                }}. The repayment amount is based on the variables selected, it is subject to our
-                assessment and suitability, and other terms and conditions apply.</small
+                >Total repayments ${{ totalAmountToPay }} made up of an establishment fee ${{
+                  establishmentFee.toFixed(2)
+                }}, interest of ${{ totalInterest.toFixed(2) }}. The repayment amount is based on
+                the variables selected, it is subject to our assessment and suitability, and other
+                terms and conditions apply.</small
               >
             </p>
           </div>
