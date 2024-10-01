@@ -1,3 +1,10 @@
+Pre-requisite:
+Visual Studio Code:
+https://code.visualstudio.com/
+
+Node JS:
+https://nodejs.org/en/
+
 # MoneyMe_Challenge_UI
 
 This template should help get you started developing with Vue 3 in Vite.
